@@ -1,0 +1,411 @@
+#include <ESP32Servo.h>    // servo kütüphanesinin eklenmesi
+
+
+// Fonksiyon çağırırken geciklemeleri yazma (milisaniye)
+const unsigned long FUNCTION_DELAY = 2000; // 2 saniye
+
+const unsigned long t = 2;
+const unsigned long tt = 5;
+
+// Define 8 Servos
+Servo myServo1; // Ön sol pivot Servo
+Servo myServo2; // Ön sol kaldıran Servo
+Servo myServo3; // Arka sol pivot Servo
+Servo myServo4; // Arka sol kaldıran  Servo
+Servo myServo5; // Arka sağ pivot Servo
+Servo myServo6; // Arka sağ kaldıran Servo
+Servo myServo7; // Ön sağ pivot Servo
+Servo myServo8; // Ön sağ kaldıran Servo
+
+
+void setup()
+{
+
+  // Servolara Deneyap Kart pinlerini ekleme
+  myServo1.attach(D4);
+  myServo2.attach(D5);
+  myServo3.attach(D6);
+  myServo4.attach(D7);
+  myServo5.attach(D0);
+  myServo6.attach(D9);
+  myServo7.attach(D1);
+  myServo8.attach(D12);
+
+  center_servos();
+  Serial.println("center");
+  delay(2000);
+}
+
+void loop()
+{
+ //Öne doğru 10 adım
+  for (int i = 0; i < 10; i++) {
+    moveLegServos_Forward();
+  }
+  center_servos();
+  delay(FUNCTION_DELAY);
+         
+    // Geriye doğru 10 adım
+  for (int i = 0; i < 10; i++) {
+    moveLegServos_Backward();
+ }
+  center_servos();
+  delay(FUNCTION_DELAY);
+    // Sağa doğru 10 adım
+  for (int i = 0; i < 10; i++) {
+    moveLegServos_Right();
+  }
+  center_servos();
+  delay(FUNCTION_DELAY);
+    // Sola doğru 10 adım
+  for (int i = 0; i < 10; i++) {
+    moveLegServos_Left();
+  }
+  center_servos();
+  delay(FUNCTION_DELAY);
+   //  10 adımda dans
+  for (int i = 0; i < 5; i++) {
+    dance();
+  }
+  center_servos();
+  delay(FUNCTION_DELAY);
+   // 10 push-up
+  for (int i = 0; i < 10; i++) {
+    pushup();
+  }
+  center_servos();
+  delay(FUNCTION_DELAY);
+}
+  
+
+       //  Örümcek Robotu İleri Taşıma Fonksiyonu
+void moveLegServos_Forward()
+{
+
+  // Her bacak için servo hareketlerini kontrol etme
+  
+  // Sol taraftaki ayaklar - Bacak 1
+  moveLeg_Left_Forward(myServo8, myServo7, myServo8);
+  
+  // Sol taraftaki ayaklar -  Bacak 4
+  moveLeg_Left_Forward(myServo2, myServo1, myServo2);
+  
+  // Sol taraftaki ayaklar - Bacak 1 ve 4
+  for (int angle = 0; angle <= 90; angle += 2) {
+    myServo7.write(angle);
+    myServo1.write(angle);
+    delay(tt);
+  }
+  
+  // Sağ taraftaki ayaklar - Bacak 2
+  moveLeg_Right_Forward(myServo6, myServo5, myServo6);
+  
+  // Sağ taraftaki ayaklar - Bacak 3
+  moveLeg_Right_Forward(myServo4, myServo3, myServo4);
+  
+  // Sağ taraftaki ayaklar - Bacak 2 ve 3
+  for (int angle = 180; angle >= 90; angle -= 2) {
+    myServo5.write(angle);
+    myServo3.write(angle);
+    delay(tt);
+  }
+}  
+  
+      // Örümcek Robotu Geriye Taşıma Fonksiyonu
+void moveLegServos_Backward()
+{
+   
+   // Her bacak için servo hareketlerini kontrol etme
+  // Sol yan bacak - Bacak 1
+  moveLeg_Left_Backward(myServo2, myServo1, myServo2);
+
+  // Sol yan bacak - Bacak 4
+  moveLeg_Left_Backward(myServo8, myServo7, myServo8);
+
+  // Sol yan bacak - Bacak 1 ve 4
+  for (int angle = 180; angle >= 90; angle -= 2) {
+    myServo1.write(angle);
+    myServo7.write(angle);
+    delay(tt);
+  }
+
+  // Sağ yan bacak- Bacak 2
+  moveLeg_Right_Backward(myServo4, myServo3, myServo4);
+
+  // Sağ yan bacak - Bacak 3
+  moveLeg_Right_Backward(myServo6, myServo5, myServo6);
+
+  // Sağ taraftaki bacaklar - Bacak 2 ve 3
+  for (int angle = 0; angle <= 90; angle += 2) {
+    myServo3.write(angle);
+    myServo5.write(angle);
+    delay(tt);
+  }
+}
+                
+         // Örümceği sağa döndürme fonksiyonu
+ void moveLegServos_Right() {
+  // Her bacak için sağa dönüş servo hareketlerini kontrol etme
+  moveLeg_Right(myServo8, myServo7, myServo5); // Bacak 4
+  moveLeg_Right(myServo2, myServo1, myServo7); // Bacak 3
+  moveLeg_Right(myServo4, myServo3, myServo1); // Bacak 2
+  moveLeg_Right(myServo6, myServo5, myServo3); // Bacak 1
+}
+
+       // Örümcek Robotu Sola Taşıma
+void moveLegServos_Left() {
+  // Her bacak için Sola dönüş servo hareketlerini kontrol etme
+  moveLeg_Left(myServo8, myServo7, myServo1); // Bacak 4
+  moveLeg_Left(myServo6, myServo5, myServo7); // Bacak 3
+  moveLeg_Left(myServo4, myServo3, myServo5); // Bacak 2
+  moveLeg_Left(myServo2, myServo1, myServo3); // Bacak 1
+}
+  
+       //  Örüm robot dans etme fonksiyonu
+void dance(){
+    // Seçilen servoları 0 ila 180 derece arasında hareket ettirme
+  for (int angle = 0; angle <= 180; angle += 2) {
+    myServo1.write(angle);
+    myServo3.write(angle);
+    myServo5.write(angle);
+    myServo7.write(angle);
+    delay(t);  //  Her açı değişimi arasındaki gecikme (istediğiniz değeri seçebilirsiniz)
+  }
+
+  // Seçilen servoları 180 ila 0 derece arasında hareket ettirme
+  for (int angle = 180; angle >= 0; angle -= 2) {
+    myServo1.write(angle);
+    myServo3.write(angle);
+    myServo5.write(angle);
+    myServo7.write(angle);
+    delay(t);  // Her açı değişimi arasındaki gecikme (gerektiği gibi ayarlayın)
+  }
+center_servos();
+  delay(100);
+  lean_left();
+  delay(300);
+  lean_right();
+  delay(300);
+  lean_left();
+  delay(300);
+  lean_right();
+  delay(300);
+  lean_left();
+  delay(300);
+  lean_right();
+  delay(300);
+  lean_left();
+  delay(300);
+  lean_right();
+  delay(500);
+  center_servos();
+  delay(300);
+  bow();
+  center_servos();
+}
+
+         //  Örümcek Robot Şınav Fonksiyonu
+void pushup(){
+    // Seçilen servoları 0 ila 180 derece arasında hareket ettirme
+  for (int angle = 0; angle <= 180; angle += 2) {
+    myServo2.write(angle);
+    myServo4.write(angle);
+    myServo6.write(angle);
+    myServo8.write(angle);
+    delay(10);  // Her açı değişimi arasındaki gecikme (gerektiği gibi ayarlayın)
+  }
+
+  // Seçilen servoları 180 ila 0 derece arasında hareket ettirin
+  for (int angle = 180; angle >= 0; angle -= 2) {
+    myServo2.write(angle);
+    myServo4.write(angle);
+    myServo6.write(angle);
+    myServo8.write(angle);
+    delay(10);  // Her açı değişimi arasındaki gecikme (gerektiği gibi ayarlayın)
+  }
+  
+}
+
+
+
+          // Örümcek Robotu İleri taşıma
+
+void moveLeg_Left_Forward(Servo& liftServo, Servo& pivotServo , Servo& oppositePivotServo)
+{
+  // Kaldırma servosunu 90'dan 180'e hareket ettirme
+  for (int angle = 90; angle <= 180; angle += 2) {
+    liftServo.write(angle);
+    delay(tt);
+  }
+
+  // Pivot servosunu 90'dan 0'a hareket ettirme
+  for (int angle = 90; angle >= 0; angle -= 2) {
+    pivotServo.write(angle);
+    delay(tt);
+  }
+
+  // Kaldırma servosunu 180'den 90'a getirme
+  for (int angle = 180; angle >= 90; angle -= 2) {
+    liftServo.write(angle);
+    delay(tt);
+  }
+}
+void moveLeg_Right_Forward(Servo& liftServo, Servo& pivotServo , Servo& oppositePivotServo)
+{
+  // Kaldırma servosunu 90'dan 180'e hareket ettirme
+  for (int angle = 90; angle <= 180; angle += 2) {
+    liftServo.write(angle);
+    delay(tt);
+  }
+
+  // Pivot servoyu 90'dan 180'e hareket ettirme
+  for (int angle = 90; angle <= 180; angle += 2) {
+    pivotServo.write(angle);
+    delay(tt);
+  }
+
+  // Kaldırma servosunu 180'den 90'a hareket ettirme
+  for (int angle = 180; angle >= 90; angle -= 2) {
+    liftServo.write(angle);
+    delay(tt);
+  }
+}
+        // Örümcek robot geri hareket logic
+void moveLeg_Left_Backward(Servo& liftServo, Servo& pivotServo, Servo& oppositePivotServo)
+{
+  // Kaldırma servosunu 90'dan 180'e hareket ettirme
+  for (int angle = 90; angle <= 180; angle += 2) {
+    liftServo.write(angle);
+    delay(tt);
+  }
+
+  //  Pivot servoyu 90'dan 180'e hareket ettirme
+  for (int angle = 90; angle <= 180; angle += 2) {
+    pivotServo.write(angle);
+    delay(tt);
+  }
+
+  // Kaldırma servosunu 180'den 90'a hareket ettirme
+  for (int angle = 180; angle >= 90; angle -= 2) {
+    liftServo.write(angle);
+    delay(tt);
+  }
+}
+
+void moveLeg_Right_Backward(Servo& liftServo, Servo& pivotServo, Servo& oppositePivotServo)
+{
+  // Kaldırma servosunu 90'dan 180'e hareket ettirme
+  for (int angle = 90; angle <= 180; angle += 2) {
+    liftServo.write(angle);
+    delay(tt);
+  }
+
+  //  Pivot servosunu 90'dan 0'a hareket ettirme
+  for (int angle = 90; angle >= 0; angle -= 2) {
+    pivotServo.write(angle);
+    delay(tt);
+  }
+
+  // Kaldırma servosunu 180'den 90'a hareket ettirme
+  for (int angle = 180; angle >= 90; angle -= 2) {
+    liftServo.write(angle);
+    delay(tt);
+  }
+}
+             
+             // Örümcek robotu sağa doğru taşıma
+void moveLeg_Right(Servo& liftServo, Servo& pivotServo , Servo& oppositePivotServo)
+{
+  //Kaldırma servosunu 90'dan 180'e hareket ettirme
+  for (int angle = 90; angle <= 180; angle += 2) {
+    liftServo.write(angle);
+    delay(t);
+  }
+
+  //Pivot servosunu 90'dan 0'a hareket ettirin
+  for (int angle = 90; angle >= 0; angle -= 2) {
+    pivotServo.write(angle);
+    delay(t);
+  }
+
+  // Karşı pivot servosunu 0'dan 90'a hareket ettirme
+  for (int angle = 0; angle <= 90; angle += 2) {
+    oppositePivotServo.write(angle);
+    delay(t);
+  }
+
+  // Kaldırma servosunu 90'dan 180'e hareket ettirme
+  for (int angle = 180; angle >= 90; angle -= 2) {
+    liftServo.write(angle);
+    delay(t);
+  }
+}
+
+          // Örümcek Robotu Sola Taşı mantığı
+void moveLeg_Left(Servo& liftServo, Servo& pivotServo , Servo& oppositePivotServo)
+{
+  // Kaldırma servosunu 90'dan 180'e hareket ettirme
+  for (int angle = 90; angle <= 180; angle += 2) {
+    liftServo.write(angle);
+    delay(t);
+  }
+
+  // Pivot servoyu 90'dan 180'e hareket ettirme
+  for (int angle = 90; angle <= 180; angle += 2) {
+    pivotServo.write(angle);
+    delay(t);
+  }
+
+  // Karşı pivot servosunu 180'den 90'a hareket ettirme
+  for (int angle = 180; angle >= 90; angle -= 2) {
+    oppositePivotServo.write(angle);
+    delay(t);
+  }
+
+  // Kaldırma servosunu 180'den 90'a hareket ettirme
+  for (int angle = 180; angle >= 90; angle -= 2) {
+    liftServo.write(angle);
+    delay(t);
+  }
+}
+
+void bow()
+{
+  center_servos();
+  delay(200);
+  myServo2.write(15);
+  myServo8.write(15);
+  delay(700);
+  myServo2.write(90);
+  myServo8.write(90);
+  delay(700);
+}
+
+void lean_left()
+{
+  myServo2.write(15);
+  myServo4.write(15);
+  myServo6.write(150);
+  myServo8.write(150);
+}
+
+void lean_right()
+{
+  myServo2.write(150);
+  myServo4.write(150);
+  myServo6.write(15);
+  myServo8.write(15);
+}
+
+      // Tüm servoları 90 dereceye sabitleme
+void center_servos()
+{
+  myServo1.write(90);
+  myServo2.write(90);
+  myServo3.write(90);
+  myServo4.write(90);
+  myServo5.write(90);
+  myServo6.write(90);
+  myServo7.write(90);
+  myServo8.write(90);
+}
